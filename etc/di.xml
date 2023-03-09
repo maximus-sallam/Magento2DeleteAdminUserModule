@@ -1,0 +1,7 @@
+<type name="Magento\Framework\Console\CommandList">
+    <arguments>
+        <argument name="commands" xsi:type="array">
+            <item name="delete_admin_user" xsi:type="object">MaximusSallam\DeleteAdminUserModule\Console\DeleteAdminUser</item>
+        </argument>
+    </arguments>
+</type>
