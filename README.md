@@ -1,5 +1,7 @@
 # Magento 2 DeleteAdminUserCommand module
+#DO NOT USE **** BROKEN **** DO NOT USE 
 
-A module for Magento 2 that allows you to delete admin users from the command line
+#DO NOT USE **** BROKEN **** DO NOT USE 
 
-Usage: $ php bin/magento admin:user:delete <admin_username>
+
+#DO NOT USE **** BROKEN **** DO NOT USE 
