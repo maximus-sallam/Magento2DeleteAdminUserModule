@@ -1,51 +1,55 @@
-namespace MaximusSallam\DeleteAdminUserModule\Console;
+<?php
+namespace MaximusSallam\DeleteAdminUserCommand\Console;
 
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Input\InputArgument;
 use Magento\User\Model\UserFactory;
-use Magento\Framework\Exception\NoSuchEntityException;
 
-class DeleteAdminUser extends Command
+class DeleteAdminUserCommand extends Command
 {
+    const USERNAME_ARGUMENT = 'username';
+
     protected $userFactory;
 
-    public function __construct(
-        UserFactory $userFactory,
-        string $name = null
-    ) {
+    public function __construct(UserFactory $userFactory)
+    {
         $this->userFactory = $userFactory;
-        parent::__construct($name);
+        parent::__construct();
     }
 
     protected function configure()
     {
         $this->setName('admin:user:delete')
-//            ->setDescription('Delete an admin user by ID');
-//        $this->addArgument('user_id', \Symfony\Component\Console\Input\InputArgument::REQUIRED, 'Admin user ID');
-	    ->setDescription('Delete an admin user by username');
-   	$this->addArgument('username', \Symfony\Component\Console\Input\InputArgument::REQUIRED, 'Admin user username');
+            ->setDescription('Delete admin user by username')
+            ->setDefinition([
+                new InputArgument(
+                    self::USERNAME_ARGUMENT,
+                    InputArgument::REQUIRED,
+                    'Username of the admin user to delete'
+                )
+            ]);
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-//        $userId = $input->getArgument('user_id');
-//        $user = $this->userFactory->create();
-//        try {
-//            $user->load($userId);
-//            $user->delete();
-//            $output->writeln("Admin user $userId deleted successfully.");
-//        } catch (NoSuchEntityException $e) {
-//            $output->writeln("Admin user $userId not found.");
-//        } catch (\Exception $e) {
-//            $output->writeln("Error deleting admin user $userId: " . $e->getMessage());
-    	$username = $input->getArgument('username');
-    	$user = $this->userFactory->create()->loadByUsername($username);
-    	if ($user->getId()) {
-        	$user->delete();
-        	$output->writeln("Admin user $username deleted successfully.");
-    	} else {
-        	$output->writeln("Admin user $username not found.");
+        $username = $input->getArgument(self::USERNAME_ARGUMENT);
+        $user = $this->userFactory->create()->loadByUsername($username);
+
+        if (!$user->getId()) {
+            $output->writeln("<error>User with username '{$username}' does not exist.</error>");
+            return 1;
         }
+
+        try {
+            $user->delete();
+            $output->writeln("<info>Admin user '{$username}' has been deleted.</info>");
+        } catch (\Exception $e) {
+            $output->writeln("<error>Error deleting admin user '{$username}': " . $e->getMessage() . "</error>");
+            return 1;
+        }
+
+        return 0;
     }
 }
